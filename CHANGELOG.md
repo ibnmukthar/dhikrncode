@@ -3,6 +3,13 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.6
+
+- Add `dhikrncode doctor` — diagnoses common setup problems by checking
+  PATH, dependency resolution, config, hook installation, daemon health,
+  and surfacing recent errors from `daemon.log`. Run this first when
+  something doesn't seem to be working.
+
 ## 0.1.5
 
 - **First-run setup wizard.** The very first time you run `dhikrncode`,

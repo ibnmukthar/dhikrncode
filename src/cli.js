@@ -18,6 +18,7 @@ const COMMANDS = {
   setup: () => require('./commands/setup.js').run,
   on: () => require('./commands/onoff.js').on.run,
   off: () => require('./commands/onoff.js').off.run,
+  doctor: () => require('./commands/doctor.js').run,
   help: () => printHelp,
   '--help': () => printHelp,
   '-h': () => printHelp,
@@ -49,6 +50,7 @@ Daemon / window:
   dhikrncode daemon        Run daemon in foreground (debug)
 
 Other:
+  dhikrncode doctor        Diagnose setup issues (run if something seems off)
   dhikrncode help          This help
   dhikrncode version       Show version
   dhikrncode hook <event>  Internal: invoked by Claude Code
