@@ -3,6 +3,24 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.4
+
+- **One-command setup.** Running `dhikrncode` for the first time now
+  auto-installs Claude Code hooks and drops into the interactive shell
+  — no separate `dhikrncode init` step. New users can:
+
+  ```bash
+  npm install -g dhikrncode
+  dhikrncode      # done; hooks set up, shell ready
+  ```
+
+- **Sticky uninstall.** `dhikrncode uninstall` now also stops the
+  running daemon and writes `meta.uninstalledAt` to config. Subsequent
+  `dhikrncode` runs respect that — they show "you previously
+  uninstalled" and do **not** silently re-install. Run `init` (inside
+  the shell or via `dhikrncode init`) to opt back in; that clears the
+  marker.
+
 ## 0.1.3
 
 - **Fix: closing the tab no longer stops auto-open from working.** v0.1.1

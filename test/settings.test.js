@@ -11,6 +11,7 @@ const {
   uninstallHooks,
   loadSettings,
   saveSettings,
+  hooksInstalled,
 } = require('../src/lib/settings.js');
 
 function tmpFile() {
@@ -112,4 +113,29 @@ test('load throws helpful error on invalid JSON', () => {
 test('load returns empty for missing file', () => {
   const p = tmpFile();
   assert.deepStrictEqual(loadSettings(p), {});
+});
+
+test('hooksInstalled detects fresh install', () => {
+  assert.strictEqual(hooksInstalled({}), false);
+  assert.strictEqual(hooksInstalled({ hooks: {} }), false);
+
+  const installed = installHooks({}).settings;
+  assert.strictEqual(hooksInstalled(installed), true);
+
+  const removed = uninstallHooks(installed).settings;
+  assert.strictEqual(hooksInstalled(removed), false);
+});
+
+test('hooksInstalled with only user-owned hooks returns false', () => {
+  const settings = {
+    hooks: {
+      Stop: [
+        {
+          matcher: '',
+          hooks: [{ type: 'command', command: 'echo "user hook"' }],
+        },
+      ],
+    },
+  };
+  assert.strictEqual(hooksInstalled(settings), false);
 });

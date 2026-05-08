@@ -31,13 +31,19 @@ Requires Node 18+.
 
 ```bash
 npm install -g dhikrncode
-dhikrncode init
+dhikrncode
 ```
 
-`dhikrncode init` adds three hooks to `~/.claude/settings.json`. It
-**merges** into your existing settings — your other hooks are preserved
-— and re-running it is idempotent. Remove cleanly with `dhikrncode
-uninstall`.
+That's it. The first time you run `dhikrncode`, it sets up Claude Code
+hooks (merging into `~/.claude/settings.json` without touching anything
+else you have there) and drops you into the interactive shell. From then
+on it's invisible — open Claude Code, send a prompt, the window pops up
+on its own.
+
+Remove anytime with `dhikrncode uninstall` (removes hooks, stops the
+daemon, and remembers you uninstalled so re-running `dhikrncode` won't
+silently turn things back on). To opt back in later, run `dhikrncode`
+and type `init` inside the shell.
 
 ## Use
 

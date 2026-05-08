@@ -6,11 +6,15 @@ const {
   installHooks,
   SETTINGS_PATH,
 } = require('../lib/settings.js');
+const config = require('../lib/config-store.js');
 
 async function run() {
   const before = loadSettings();
   const { settings, added } = installHooks(before);
   saveSettings(settings);
+
+  // Clear any previous "you uninstalled" marker so the REPL stops nagging.
+  config.update({ meta: { uninstalledAt: null } });
 
   console.log(`dhikrncode: wrote ${SETTINGS_PATH}`);
   if (added.length === 0) {
@@ -19,8 +23,8 @@ async function run() {
     console.log(`Added hooks for: ${added.join(', ')}`);
   }
   console.log(
-    `\nTry it: open Claude Code in a project, send any prompt, and a dhikr/Qur'an window should pop up.\n` +
-      `Configure with:  dhikrncode config\n` +
+    `\nNext: open Claude Code in any project, send any prompt, and a dhikr / Qur'an window will pop up.\n` +
+      `Configure with:  dhikrncode  (then type 'help')\n` +
       `Remove with:     dhikrncode uninstall`
   );
 }

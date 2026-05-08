@@ -42,6 +42,19 @@ function isOurEntry(entry) {
   );
 }
 
+function hooksInstalled(settings) {
+  if (!settings || !settings.hooks) return false;
+  for (const event of Object.values(settings.hooks)) {
+    if (!Array.isArray(event)) continue;
+    for (const group of event) {
+      for (const h of group.hooks || []) {
+        if (isOurEntry(h)) return true;
+      }
+    }
+  }
+  return false;
+}
+
 function installHooks(settings, { binary = 'dhikrncode' } = {}) {
   const next = { ...settings };
   next.hooks = { ...(next.hooks || {}) };
@@ -112,4 +125,5 @@ module.exports = {
   saveSettings,
   installHooks,
   uninstallHooks,
+  hooksInstalled,
 };

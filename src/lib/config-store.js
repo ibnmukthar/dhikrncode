@@ -50,6 +50,11 @@ const DEFAULTS = {
     port: 31415,
     host: '127.0.0.1',
   },
+  meta: {
+    // ISO timestamp set by `dhikrncode uninstall` and cleared by `init`.
+    // While set, `dhikrncode` (REPL) will NOT silently re-install hooks.
+    uninstalledAt: null,
+  },
 };
 
 function deepMerge(base, override) {
