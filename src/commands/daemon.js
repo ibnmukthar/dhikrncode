@@ -22,8 +22,8 @@ const MIME = {
 };
 
 const IDLE_SHUTDOWN_MS = 30 * 60 * 1000; // 30 min
-const OPEN_COOLDOWN_MS = 2 * 60 * 1000; // don't auto-open another tab for 2 min after opening
-const DISCONNECT_GRACE_MS = 8 * 1000; // assume tab still alive for 8s after WS drop
+const LOADING_COOLDOWN_MS = 30 * 1000; // when no tab has connected yet, wait this long before opening another (covers slow page load)
+const DISCONNECT_GRACE_MS = 8 * 1000; // treat the tab as still alive for this long after a WS drop
 
 function loadAdhkar() {
   const p = path.join(DATA_DIR, 'adhkar.json');
@@ -80,9 +80,11 @@ class Hub {
     this.clients = new Set();
     this.state = { phase: 'idle', reason: null, since: Date.now() };
     this.lastDisconnectAt = 0;
+    this.hasEverConnected = false;
   }
   add(ws) {
     this.clients.add(ws);
+    this.hasEverConnected = true;
     this.sendTo(ws, { type: 'state', state: this.state });
     const onClose = () => {
       this.clients.delete(ws);
@@ -90,15 +92,6 @@ class Hub {
     };
     ws.on('close', onClose);
     ws.on('error', onClose);
-  }
-  // True if there's an open tab right now, OR one disconnected very recently
-  // (covers brief network blips and tab-freeze where the WS will reconnect).
-  hasActiveOrRecentTab() {
-    if (this.clients.size > 0) return true;
-    if (this.lastDisconnectAt && Date.now() - this.lastDisconnectAt < DISCONNECT_GRACE_MS) {
-      return true;
-    }
-    return false;
   }
   sendTo(ws, msg) {
     try {
@@ -273,18 +266,38 @@ async function maybeOpenWindow(hub, { force = false } = {}) {
   }
 
   if (!force) {
-    if (hub.hasActiveOrRecentTab()) {
+    // 1. There's a live tab right now → don't open another.
+    if (hub.clients.size > 0) {
       console.log(
-        `[${new Date().toISOString()}] open skipped: tab already open (${hub.clients.size} clients)`
+        `[${new Date().toISOString()}] open skipped: tab connected (${hub.clients.size} clients)`
       );
       return;
     }
-    const sinceOpen = Date.now() - lastOpenAt;
-    if (lastOpenAt && sinceOpen < OPEN_COOLDOWN_MS) {
+
+    // 2. A tab JUST disconnected — could be a tab-freeze / WS blip that's
+    //    about to reconnect. Wait it out.
+    const sinceDisconnect = hub.lastDisconnectAt ? Date.now() - hub.lastDisconnectAt : Infinity;
+    if (sinceDisconnect < DISCONNECT_GRACE_MS) {
       console.log(
-        `[${new Date().toISOString()}] open skipped: cooldown (${Math.round(sinceOpen / 1000)}s of ${OPEN_COOLDOWN_MS / 1000}s)`
+        `[${new Date().toISOString()}] open skipped: WS just dropped (${Math.round(sinceDisconnect / 1000)}s ago)`
       );
       return;
+    }
+
+    // 3. A tab was connected at some point and is now closed past the grace
+    //    period — user genuinely closed it. Allow re-opening on this prompt.
+    //    (Falls through to the open call below.)
+    if (!hub.hasEverConnected) {
+      // 4. No tab has connected yet. We may have already called openUrl()
+      //    and the page is still loading. Apply a short cooldown so we
+      //    don't stack opens for back-to-back queued prompts.
+      const sinceOpen = lastOpenAt ? Date.now() - lastOpenAt : Infinity;
+      if (sinceOpen < LOADING_COOLDOWN_MS) {
+        console.log(
+          `[${new Date().toISOString()}] open skipped: page still loading (${Math.round(sinceOpen / 1000)}s of ${LOADING_COOLDOWN_MS / 1000}s)`
+        );
+        return;
+      }
     }
   }
 
@@ -294,6 +307,9 @@ async function maybeOpenWindow(hub, { force = false } = {}) {
     const url = `http://${cfg.daemon.host}:${cfg.daemon.port}/`;
     await openUrl(url);
     lastOpenAt = Date.now();
+    // We've spawned a new tab; "hasEverConnected" now refers to the previous
+    // tab.  Reset so the loading cooldown applies until this new tab connects.
+    hub.hasEverConnected = false;
   } finally {
     setTimeout(() => {
       openInFlight = false;

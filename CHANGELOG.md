@@ -3,6 +3,16 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.3
+
+- **Fix: closing the tab no longer stops auto-open from working.** v0.1.1
+  added a 2-minute global cooldown to prevent extra tabs on queued
+  prompts; that turned out to swallow legitimate re-opens after the user
+  manually closed the tab. The cooldown is now scoped to "page is still
+  loading" — after a real WS connect+disconnect cycle, the next prompt
+  immediately opens a fresh tab. The original queued-prompt protection
+  is preserved by the in-flight + page-load checks.
+
 ## 0.1.2
 
 - **Distinguish Claude Code CLI from Claude Code in Claude Desktop.**
