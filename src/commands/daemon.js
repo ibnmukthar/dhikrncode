@@ -419,6 +419,18 @@ function handleEvent(payload, hub) {
       hub.setState({ phase: 'ready', reason: 'done' });
       break;
     }
+    case 'pre-tool-use': {
+      // Agent is actively running tools. If we'd transitioned to "ready"
+      // (e.g., the user just approved a permission prompt), flip back to
+      // "busy" so the dhikr window keeps the user company while work
+      // resumes. We deliberately no-op when already busy/idle to avoid
+      // churning state on every tool invocation.
+      if (hub.state.phase === 'ready') {
+        cancelPendingRepeats();
+        hub.setState({ phase: 'busy', reason: null });
+      }
+      break;
+    }
     default:
       console.log(`[${new Date().toISOString()}] ignored unknown event type: ${type}`);
       break;

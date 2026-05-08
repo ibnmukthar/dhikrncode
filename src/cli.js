@@ -64,17 +64,35 @@ function printVersion() {
   console.log(pkg.version);
 }
 
-function noticeIfHooksMissing() {
-  const { loadSettings, hooksInstalled } = require('./lib/settings.js');
+function syncHooks() {
+  // - Respect user's prior uninstall: if uninstalledAt is set, never silently
+  //   reinstall — just show a notice if hooks are absent.
+  // - Otherwise: idempotently install any missing hooks. This is how existing
+  //   users pick up new hooks added in newer versions (e.g., PreToolUse in
+  //   v0.1.7) without having to re-run `dhikrncode init`.
+  const {
+    loadSettings,
+    saveSettings,
+    installHooks,
+    hooksInstalled,
+  } = require('./lib/settings.js');
   const config = require('./lib/config-store.js');
+
   const settings = loadSettings();
   const cfg = config.load();
-  if (hooksInstalled(settings)) return;
+
   if (cfg.meta && cfg.meta.uninstalledAt) {
-    console.log('dhikrncode: hooks are not installed (you previously uninstalled).');
-    console.log("Type 'init' to re-enable Claude Code integration, or 'exit' to leave.\n");
-  } else {
-    console.log('dhikrncode: hooks not installed. Run `dhikrncode init` to enable Claude Code integration.\n');
+    if (!hooksInstalled(settings)) {
+      console.log('dhikrncode: hooks are not installed (you previously uninstalled).');
+      console.log("Type 'init' to re-enable Claude Code integration.\n");
+    }
+    return;
+  }
+
+  const { settings: next, added } = installHooks(settings);
+  if (added.length > 0) {
+    saveSettings(next);
+    console.log(`✓ Updated Claude Code hooks (added: ${added.join(', ')})\n`);
   }
 }
 
@@ -90,9 +108,10 @@ async function main() {
     if (!cfg.meta || !cfg.meta.setupCompletedAt) {
       factory = COMMANDS.setup;
     } else {
-      // Subsequent run → check hooks state, drop into REPL
+      // Subsequent run → silently sync hooks (in case we added new ones in
+      // a version upgrade), then drop into REPL.
       try {
-        noticeIfHooksMissing();
+        syncHooks();
       } catch (err) {
         console.error(`dhikrncode: ${err.message}`);
       }

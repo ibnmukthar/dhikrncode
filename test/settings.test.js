@@ -19,12 +19,16 @@ function tmpFile() {
   return p;
 }
 
-test('install adds three hooks to empty settings', () => {
+test('install adds all hooks to empty settings', () => {
   const { settings, added } = installHooks({});
-  assert.deepStrictEqual(added.sort(), ['Notification', 'Stop', 'UserPromptSubmit']);
+  assert.deepStrictEqual(
+    added.sort(),
+    ['Notification', 'PreToolUse', 'Stop', 'UserPromptSubmit']
+  );
   assert.ok(settings.hooks.UserPromptSubmit);
   assert.ok(settings.hooks.Notification);
   assert.ok(settings.hooks.Stop);
+  assert.ok(settings.hooks.PreToolUse);
 
   const cmds = settings.hooks.Stop[0].hooks.map((h) => h.command);
   assert.ok(cmds.some((c) => c.startsWith('dhikrncode hook stop')));
@@ -54,7 +58,11 @@ test('install preserves existing user hooks', () => {
   };
   const { settings } = installHooks(existing);
   assert.strictEqual(settings.otherKey, 'preserved');
-  assert.deepStrictEqual(settings.hooks.PreToolUse, existing.hooks.PreToolUse);
+  // user's audit-bash entry survived
+  const preToolCommands = settings.hooks.PreToolUse.flatMap((g) =>
+    (g.hooks || []).map((h) => h.command)
+  );
+  assert.ok(preToolCommands.includes('audit-bash.sh'));
 
   const stopCommands = settings.hooks.Stop[0].hooks.map((h) => h.command);
   assert.ok(stopCommands.includes('echo "user hook"'));
@@ -75,7 +83,7 @@ test('uninstall removes only our entries', () => {
   const installed = installHooks(existing).settings;
   const { settings, removed } = uninstallHooks(installed);
 
-  assert.strictEqual(removed.length, 3);
+  assert.strictEqual(removed.length, 4);
   // user hook still there
   const stopCommands = settings.hooks.Stop[0].hooks.map((h) => h.command);
   assert.ok(stopCommands.includes('echo "user hook"'));

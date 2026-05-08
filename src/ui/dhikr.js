@@ -2,36 +2,77 @@
 
 window.DhikrView = (function () {
   let activeKeydown = null;
+  const STORAGE_KEY = 'dhikrncode.tasbeeh.v1';
+  const LIFETIME_KEY = 'dhikrncode.tasbeeh.lifetime.v1';
+
+  // Per-dhikr counter, keyed by arabic text so it survives reorderings
+  // and additions to adhkar.json. {arabic: count}
+  function loadCounters() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
+    } catch {
+      return {};
+    }
+  }
+  function saveCounters(map) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    } catch {}
+  }
+  function loadLifetime() {
+    try {
+      return parseInt(localStorage.getItem(LIFETIME_KEY) || '0', 10) || 0;
+    } catch {
+      return 0;
+    }
+  }
+  function saveLifetime(n) {
+    try {
+      localStorage.setItem(LIFETIME_KEY, String(n));
+    } catch {}
+  }
 
   function render(container, { adhkar }, { onChange } = {}) {
     let idx = 0;
-    let count = 0;
+    const counters = loadCounters();
+    let lifetime = loadLifetime();
+
+    const currentArabic = () => adhkar[idx].arabic;
+    const getCount = () => counters[currentArabic()] || 0;
+    const setCount = (n) => {
+      counters[currentArabic()] = n;
+      saveCounters(counters);
+    };
 
     const actions = {
       next() {
         idx = (idx + 1) % adhkar.length;
-        count = 0;
         paint();
       },
       prev() {
         idx = (idx - 1 + adhkar.length) % adhkar.length;
-        count = 0;
         paint();
       },
       tap() {
-        count++;
+        const next = getCount() + 1;
+        setCount(next);
+        lifetime += 1;
+        saveLifetime(lifetime);
         const el = container.querySelector('#counter-num');
-        if (el) el.textContent = count;
+        if (el) el.textContent = next;
+        const lt = container.querySelector('#lifetime-num');
+        if (lt) lt.textContent = lifetime.toLocaleString();
       },
       reset() {
-        count = 0;
+        setCount(0);
         const el = container.querySelector('#counter-num');
-        if (el) el.textContent = count;
+        if (el) el.textContent = 0;
       },
     };
 
     function paint() {
       const item = adhkar[idx];
+      const count = getCount();
       container.innerHTML = `
         <div class="dhikr-card">
           <p class="dhikr-arabic">${escapeHtml(item.arabic)}</p>
@@ -47,14 +88,17 @@ window.DhikrView = (function () {
             </span>
             <button class="btn-icon" data-act="next" aria-label="Next (→)" title="Next (→)">›</button>
           </div>
-          <p class="shortcut-hint">← → navigate · Space tap · R reset</p>
+          <p class="shortcut-hint">
+            ← → navigate · Space tap · R reset
+            · lifetime <span id="lifetime-num">${lifetime.toLocaleString()}</span>
+          </p>
         </div>
       `;
       container.querySelectorAll('[data-act]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           const act = e.currentTarget.dataset.act;
           if (actions[act]) actions[act]();
-          if (onChange) onChange({ idx, count });
+          if (onChange) onChange({ idx, count: getCount() });
         });
       });
     }

@@ -12,6 +12,11 @@ const HOOK_EVENTS = [
   { event: 'UserPromptSubmit', arg: 'user-prompt-submit' },
   { event: 'Notification', arg: 'notification' },
   { event: 'Stop', arg: 'stop' },
+  // PreToolUse fires on every tool execution including the one immediately
+  // after the user approves a permission prompt. We use it to flip the
+  // window state from "ready (approval)" back to "busy" when the agent
+  // resumes work, so users can keep doing dhikr while the session continues.
+  { event: 'PreToolUse', arg: 'pre-tool-use' },
 ];
 
 function loadSettings(filePath = SETTINGS_PATH) {

@@ -3,6 +3,26 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.7
+
+- **Fix: window goes back to "agent working" after permission approval.**
+  Before, when Claude asked "do you want me to run X?" and you answered
+  yes, the dhikr window stayed in the "ready" state and counted down to
+  close — even though Claude was actively running again. Now we hook
+  into `PreToolUse`, which fires immediately after approval, and flip
+  the state back to busy so you can keep doing dhikr while the session
+  continues.
+- **Tasbeeh counter now persists.** Per-dhikr counts are saved in
+  browser localStorage and survive page reloads, tab close, browser
+  restart. There's also a lifetime total shown in the shortcut hint.
+- **`dhikrncode on` is now self-healing.** If hooks are missing (because
+  you ran `uninstall` previously, or the install was never completed),
+  `on` installs them and clears the uninstalled marker. Saves the
+  "I toggled on but nothing happens" confusion.
+- **Auto-upgrade hooks on every `dhikrncode` run.** Existing users who
+  upgrade from 0.1.6 will silently pick up the new `PreToolUse` hook
+  the first time they open the shell — no need to re-run `init`.
+
 ## 0.1.6
 
 - Add `dhikrncode doctor` — diagnoses common setup problems by checking
