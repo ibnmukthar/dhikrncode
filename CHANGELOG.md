@@ -3,6 +3,16 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.8
+
+- **Refocus the terminal when the dhikr tab closes.** When the auto-close
+  countdown finishes (or you click "Close now"), the OS now switches focus
+  back to the terminal app where Claude Code is running — no more clicking
+  around to get back to your session. The daemon tracks the last
+  `__CFBundleIdentifier` it saw on a hook event and uses
+  `osascript -e 'tell application id "..." to activate'` to bring it
+  forward. macOS only for now.
+
 ## 0.1.7
 
 - **Fix: window goes back to "agent working" after permission approval.**

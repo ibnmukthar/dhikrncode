@@ -6,6 +6,7 @@ const path = require('path');
 const config = require('../lib/config-store.js');
 const { openUrl } = require('../lib/window.js');
 const { notify } = require('../lib/notify.js');
+const { refocusByBundleId } = require('../lib/refocus.js');
 
 const os = require('os');
 const UI_DIR = path.join(__dirname, '..', 'ui');
@@ -191,6 +192,14 @@ async function run() {
 
     if (req.method === 'POST' && url.pathname === '/done') {
       hub.setState({ phase: 'idle', reason: null });
+      // Refocus the user's terminal so they can keep working without
+      // manually clicking back. Best-effort, macOS-only for now.
+      if (lastTerminalBundleId) {
+        const ok = refocusByBundleId(lastTerminalBundleId);
+        console.log(
+          `[${new Date().toISOString()}] /done — refocus ${ok ? 'sent' : 'skipped'} (bundle=${lastTerminalBundleId})`
+        );
+      }
       return sendJson(res, 200, { ok: true });
     }
 
@@ -258,6 +267,9 @@ async function run() {
 
 let openInFlight = false;
 let lastOpenAt = 0;
+// Most recent terminal/IDE bundle id seen on incoming events. Used to refocus
+// the user's coding terminal when the dhikr tab closes.
+let lastTerminalBundleId = null;
 
 async function maybeOpenWindow(hub, { force = false } = {}) {
   if (openInFlight) {
@@ -386,6 +398,12 @@ function handleEvent(payload, hub) {
   const { type } = payload;
   const src = payload.source || 'manual';
   const reason = payload.sourceReason ? ` — ${payload.sourceReason}` : '';
+
+  // Track the user's terminal app so we can refocus it on tab close.
+  if (payload.sourceHints && payload.sourceHints.bundleId) {
+    lastTerminalBundleId = payload.sourceHints.bundleId;
+  }
+
   if (!isSourceEnabled(payload)) {
     console.log(
       `[${new Date().toISOString()}] event: ${type} skipped (source='${src}' disabled${reason})`

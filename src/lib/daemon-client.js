@@ -89,8 +89,14 @@ async function ensureDaemon(cfg = config.load(), { waitMs = 1500 } = {}) {
 async function send(eventType, payload = {}) {
   const cfg = config.load();
   await ensureDaemon(cfg);
+  // Always include source hints so the daemon can refocus the user's
+  // terminal app when the dhikr tab closes. Caller-supplied hints win
+  // (the hook command sets these explicitly via detectSource()).
+  const { detectSource } = require('./source-detect.js');
+  const detected = detectSource();
   return postJson(cfg.daemon.host, cfg.daemon.port, '/event', {
     type: eventType,
+    sourceHints: detected.hints,
     ...payload,
   });
 }
