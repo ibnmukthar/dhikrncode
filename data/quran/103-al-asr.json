@@ -1,0 +1,24 @@
+{
+  "number": 103,
+  "name": "العصر",
+  "englishName": "Al-Asr",
+  "englishTranslation": "The Declining Day",
+  "revelationType": "Meccan",
+  "ayahs": [
+    {
+      "number": 1,
+      "arabic": "وَٱلْعَصْرِ",
+      "translation": "By time,"
+    },
+    {
+      "number": 2,
+      "arabic": "إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ",
+      "translation": "Indeed, mankind is in loss,"
+    },
+    {
+      "number": 3,
+      "arabic": "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+      "translation": "Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience."
+    }
+  ]
+}

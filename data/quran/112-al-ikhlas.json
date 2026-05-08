@@ -1,0 +1,29 @@
+{
+  "number": 112,
+  "name": "الإخلاص",
+  "englishName": "Al-Ikhlas",
+  "englishTranslation": "Sincerity",
+  "revelationType": "Meccan",
+  "ayahs": [
+    {
+      "number": 1,
+      "arabic": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+      "translation": "Say, 'He is Allah, [who is] One,'"
+    },
+    {
+      "number": 2,
+      "arabic": "ٱللَّهُ ٱلصَّمَدُ",
+      "translation": "Allah, the Eternal Refuge."
+    },
+    {
+      "number": 3,
+      "arabic": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+      "translation": "He neither begets nor is born,"
+    },
+    {
+      "number": 4,
+      "arabic": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+      "translation": "Nor is there to Him any equivalent."
+    }
+  ]
+}

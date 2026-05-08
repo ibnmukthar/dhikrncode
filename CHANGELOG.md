@@ -1,0 +1,63 @@
+# Changelog
+
+All notable changes to dhikrncode are documented here. The project follows
+[Semantic Versioning](https://semver.org/).
+
+## 0.1.2
+
+- **Distinguish Claude Code CLI from Claude Code in Claude Desktop.**
+  Hooks now classify each event using macOS's `__CFBundleIdentifier` env
+  var (with `TERM_PROGRAM` as fallback) and tag the event as
+  `claude-code-cli` or `claude-code-desktop`. The two are now governed
+  by separate integration toggles — Claude Desktop defaults to **off**,
+  so the dhikr window will no longer pop up while you're using Claude
+  Code from inside the desktop app. Toggle on via the settings panel or
+  the REPL (`claude-desktop on`) if you want the window there too.
+- Daemon log shows the classification reason on every event, e.g.
+  `source='claude-code-cli' — terminal bundle id: com.apple.Terminal`,
+  so you can verify detection at a glance.
+
+## 0.1.1
+
+- **Fix: queued prompts no longer open extra browser tabs.** Auto-open
+  now has a 2-minute cooldown plus an 8-second grace period after a
+  WebSocket disconnect, which covers brief tab-freezes and slow first-
+  page-loads. Manual `dhikrncode start` still always opens a new tab.
+- Daemon startup log now shows the current mode, notifications on/off,
+  and which integrations are enabled — makes it obvious when a stale
+  config from a previous version still has `notifications.enabled: true`.
+  Disable with `dhikrncode config --notifications=false` (or the REPL).
+
+## 0.1.0 — initial public release
+
+First public release.
+
+- **Interactive shell**: run `dhikrncode` with no arguments in a terminal
+  to drop into a small REPL — same idea as typing `claude`. Change mode,
+  toggle notifications, flip integrations, control the daemon, all from
+  one prompt. Non-TTY invocations keep the help-and-exit behavior.
+- **Per-source integrations toggle**: `integrations.claudeCode`,
+  `integrations.claudeDesktop` (placeholder), `integrations.manual` —
+  flip an agent off without uninstalling its hooks.
+
+- Claude Code hook integration (`UserPromptSubmit`, `Notification`, `Stop`)
+  via `dhikrncode init` — merges idempotently into `~/.claude/settings.json`
+  and never clobbers existing user hooks.
+- Local daemon (Node) on `127.0.0.1:31415` that opens a browser window
+  with one of two modes:
+  - **Dhikr** — large Arabic phrase, transliteration, translation, optional
+    tasbeeh counter.
+  - **Qur'an** — surah picker, ayah-by-ayah display with translation.
+    Bundles Al-Fatiha and the last few short surahs (Al-Asr, Al-Kawthar,
+    Al-Ikhlas, Al-Falaq, An-Nas).
+- Auto-close countdown on agent ready, with extension button. Dhikr
+  defaults to 5 s, Qur'an to 30 s.
+- OS notifications: **off by default**; opt in via settings, with optional
+  repeat reminders at a configurable interval.
+- Settings panel in the browser window (gear icon or `,`) for changing
+  mode, surah, notifications, and pacing without leaving the page.
+- Keyboard shortcuts for navigation in both modes and for the ready banner.
+- `dhikrncode kill` / `restart` / `start` / `stop` for manual control;
+  daemon writes a PID file at `~/.cache/dhikrncode/daemon.pid`.
+- 17 unit tests covering settings merge, config-store deep-merge, and
+  notification debounce semantics.

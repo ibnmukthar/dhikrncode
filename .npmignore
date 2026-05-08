@@ -1,0 +1,10 @@
+.claude/
+.github/
+test/
+node_modules/
+*.log
+.DS_Store
+.gitignore
+.npmignore
+CONTRIBUTING.md
+package-lock.json

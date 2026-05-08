@@ -1,0 +1,52 @@
+{
+  "name": "dhikrncode",
+  "version": "0.1.2",
+  "description": "A dhikr / Qur'an companion that opens a calm browser window while your AI coding agent is working — Claude Code today, more agents soon.",
+  "keywords": [
+    "dhikr",
+    "quran",
+    "islam",
+    "muslim",
+    "claude-code",
+    "ai-agent",
+    "productivity",
+    "cli",
+    "hooks",
+    "tasbeeh"
+  ],
+  "homepage": "https://github.com/ibnmukthar/dhikrncode#readme",
+  "bugs": {
+    "url": "https://github.com/ibnmukthar/dhikrncode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ibnmukthar/dhikrncode.git"
+  },
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "dhikrncode": "./bin/dhikrncode.js"
+  },
+  "main": "src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "data",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test 'test/**/*.test.js'",
+    "daemon": "node bin/dhikrncode.js daemon",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "node-notifier": "^10.0.1",
+    "open": "^9.1.0",
+    "ws": "^8.16.0"
+  }
+}

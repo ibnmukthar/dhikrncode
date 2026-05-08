@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>dhikrncode</title>
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header class="topbar">
+        <div class="brand">dhikrncode</div>
+        <div class="mode" id="mode-label">…</div>
+        <div class="status" id="status-pill">connecting</div>
+        <button id="settings-btn" class="btn-icon icon-cog" aria-label="Settings (,)" title="Settings (,)">⚙</button>
+      </header>
+
+      <section id="content" class="content">
+        <div class="loading">Loading…</div>
+      </section>
+
+      <aside id="settings-panel" class="settings-panel hidden" aria-hidden="true">
+        <header class="settings-header">
+          <h2>Settings</h2>
+          <button id="settings-close" class="btn-icon" aria-label="Close (Esc)" title="Close (Esc)">×</button>
+        </header>
+
+        <form id="settings-form" class="settings-form">
+          <fieldset>
+            <legend>Mode</legend>
+            <label><input type="radio" name="mode" value="dhikr" /> Dhikr</label>
+            <label><input type="radio" name="mode" value="quran" /> Qur'an</label>
+          </fieldset>
+
+          <fieldset id="quran-fields">
+            <legend>Qur'an</legend>
+            <label>
+              <span>Default surah</span>
+              <select name="quran.surah" id="settings-surah"></select>
+            </label>
+            <label class="row">
+              <input type="checkbox" name="quran.showTranslation" />
+              <span>Show translation</span>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>OS notifications</legend>
+            <label class="row">
+              <input type="checkbox" name="notifications.enabled" />
+              <span>Notify when agent is ready</span>
+            </label>
+            <label>
+              <span>How many reminders per ready event</span>
+              <input type="number" name="notifications.repeat" min="1" max="10" />
+            </label>
+            <label>
+              <span>Seconds between reminders</span>
+              <input type="number" name="notifications.repeatIntervalSeconds" min="5" max="600" />
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Integrations</legend>
+            <p class="muted small">Pick which surfaces should trigger the dhikr window.</p>
+            <label class="row">
+              <input type="checkbox" name="integrations.claudeCode.enabled" />
+              <span>Claude Code (CLI / terminal)</span>
+            </label>
+            <label class="row">
+              <input type="checkbox" name="integrations.claudeDesktop.enabled" />
+              <span>Claude Code in Claude Desktop</span>
+            </label>
+            <label class="row">
+              <input type="checkbox" name="integrations.manual.enabled" />
+              <span>Manual mode (start/stop)</span>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Pacing</legend>
+            <label>
+              <span>Dhikr — auto-close (s)</span>
+              <input type="number" name="pacing.dhikrCloseSeconds" min="1" max="60" />
+            </label>
+            <label>
+              <span>Qur'an — auto-close (s)</span>
+              <input type="number" name="pacing.quranCloseSeconds" min="5" max="300" />
+            </label>
+          </fieldset>
+
+          <div class="settings-actions">
+            <span id="settings-status" class="settings-status"></span>
+            <button type="submit" class="btn">Save</button>
+          </div>
+        </form>
+      </aside>
+
+      <div id="ready-banner" class="ready-banner hidden">
+        <div class="ready-text">
+          <span id="ready-icon">✓</span>
+          <span id="ready-message">Agent ready</span>
+        </div>
+        <div class="ready-actions">
+          <span id="countdown" class="countdown"></span>
+          <button id="extend-btn" class="btn btn-ghost">Stay longer</button>
+          <button id="close-btn" class="btn">Close now</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="/ui/dhikr.js"></script>
+    <script src="/ui/quran.js"></script>
+    <script src="/ui/settings.js"></script>
+    <script src="/ui/app.js"></script>
+  </body>
+</html>

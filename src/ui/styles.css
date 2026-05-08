@@ -1,0 +1,428 @@
+:root {
+  --bg: #f5f1e8;
+  --bg-elev: #ffffff;
+  --fg: #2d2a24;
+  --fg-muted: #6b665b;
+  --accent: #4a7c59;
+  --accent-strong: #2f5c3e;
+  --line: #e6dfce;
+  --shadow: 0 8px 24px rgba(40, 30, 10, 0.08);
+  --radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1a16;
+    --bg-elev: #25221d;
+    --fg: #ece6d6;
+    --fg-muted: #a39e91;
+    --accent: #7fb593;
+    --accent-strong: #b1d9bf;
+    --line: #34302a;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  height: 100%;
+}
+
+main#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-elev);
+}
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent-strong);
+}
+.mode {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--fg-muted);
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.status {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--fg-muted);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.status.busy {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+}
+.status.ready {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 96px;
+}
+.loading {
+  color: var(--fg-muted);
+}
+
+/* Dhikr */
+.dhikr-card {
+  text-align: center;
+  max-width: 720px;
+  width: 100%;
+}
+.dhikr-arabic {
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.6;
+  direction: rtl;
+  margin: 0 0 16px;
+  color: var(--fg);
+}
+.dhikr-translit {
+  font-style: italic;
+  color: var(--fg-muted);
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.dhikr-translation {
+  color: var(--fg);
+  font-size: 18px;
+  margin-bottom: 28px;
+}
+.dhikr-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+.shortcut-hint {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Settings panel */
+.settings-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 100vw);
+  height: 100vh;
+  background: var(--bg-elev);
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in 0.2s ease-out;
+}
+.settings-panel.hidden {
+  display: none;
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.settings-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.settings-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+}
+.settings-form {
+  padding: 18px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+.settings-form fieldset {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings-form legend {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+  padding: 0 6px;
+}
+.settings-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.settings-form label.row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.settings-form input[type='number'],
+.settings-form select {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+}
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.settings-status {
+  flex: 1;
+  font-size: 13px;
+  color: var(--accent-strong);
+}
+.settings-form .muted {
+  color: var(--fg-muted);
+  font-style: italic;
+  font-size: 12px;
+  margin-left: 4px;
+}
+.settings-form .small {
+  font-size: 12px;
+  margin: 0 0 4px;
+  font-style: normal;
+}
+.counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+}
+.counter-num {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+/* Qur'an */
+.quran-card {
+  max-width: 760px;
+  width: 100%;
+}
+.quran-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.quran-surah-name {
+  font-size: 22px;
+  font-weight: 600;
+}
+.quran-surah-meta {
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+.quran-surah-select {
+  margin-left: auto;
+  background: var(--bg-elev);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+}
+.quran-ayah-arabic {
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 2;
+  direction: rtl;
+  text-align: right;
+  margin: 0 0 20px;
+}
+.quran-ayah-num {
+  display: inline-block;
+  font-family: -apple-system, sans-serif;
+  font-size: 14px;
+  background: var(--bg-elev);
+  color: var(--accent-strong);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 0 10px;
+  margin: 0 6px;
+  vertical-align: middle;
+}
+.quran-translation {
+  color: var(--fg-muted);
+  font-size: 17px;
+  margin-bottom: 28px;
+  padding-left: 14px;
+  border-left: 3px solid var(--line);
+}
+.quran-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.quran-progress {
+  color: var(--fg-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Buttons */
+.btn {
+  font: inherit;
+  background: var(--accent);
+  color: white;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--line);
+}
+.btn-ghost:hover {
+  background: var(--bg-elev);
+}
+.btn-icon {
+  background: var(--bg-elev);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Ready banner */
+.ready-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: min(420px, 92vw);
+  animation: slide-up 0.25s ease-out;
+}
+.ready-banner.hidden {
+  display: none;
+}
+.ready-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+.ready-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ready-banner .btn {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.ready-banner .btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.ready-banner .btn-ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+.countdown {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  opacity: 0.85;
+  min-width: 28px;
+  text-align: right;
+}
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
