@@ -54,6 +54,9 @@ const DEFAULTS = {
     // ISO timestamp set by `dhikrncode uninstall` and cleared by `init`.
     // While set, `dhikrncode` (REPL) will NOT silently re-install hooks.
     uninstalledAt: null,
+    // ISO timestamp set when the first-run wizard finishes. While null,
+    // running `dhikrncode` triggers the wizard.
+    setupCompletedAt: null,
   },
 };
 

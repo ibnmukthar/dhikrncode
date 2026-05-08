@@ -34,16 +34,28 @@ npm install -g dhikrncode
 dhikrncode
 ```
 
-That's it. The first time you run `dhikrncode`, it sets up Claude Code
-hooks (merging into `~/.claude/settings.json` without touching anything
-else you have there) and drops you into the interactive shell. From then
-on it's invisible — open Claude Code, send a prompt, the window pops up
-on its own.
+The first run drops you into a 3-question setup wizard:
 
-Remove anytime with `dhikrncode uninstall` (removes hooks, stops the
-daemon, and remembers you uninstalled so re-running `dhikrncode` won't
-silently turn things back on). To opt back in later, run `dhikrncode`
-and type `init` inside the shell.
+```
+Set up Claude Code hooks now? [Y]:
+Mode — (1) dhikr   (2) qur'an [1]:
+OS notifications when the agent is ready? [n]:
+```
+
+After that you can **close the terminal** — dhikrncode only runs when
+Claude Code triggers it, and shuts itself down after 30 minutes idle.
+The window pops up on its own.
+
+```bash
+dhikrncode off          # quick toggle (hooks stay; daemon drops events)
+dhikrncode on           # quick toggle back
+dhikrncode              # re-open the interactive shell
+dhikrncode uninstall    # remove hooks, stop daemon, stop nagging
+```
+
+`uninstall` also remembers you opted out — running `dhikrncode` after
+that won't silently turn things back on. Type `init` inside the shell
+(or `dhikrncode init`) to opt back in.
 
 ## Use
 

@@ -3,6 +3,23 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.5
+
+- **First-run setup wizard.** The very first time you run `dhikrncode`,
+  a short interactive setup walks you through three questions —
+  install hooks now? mode (dhikr/qur'an)? OS notifications? — then
+  prints "you can close this terminal now" and exits. After that, every
+  subsequent `dhikrncode` opens the REPL.
+- **`dhikrncode on` / `dhikrncode off` shortcuts.** Quick one-liner
+  toggle that flips `integrations.claudeCode.enabled` and pushes the
+  change to the running daemon. Hooks stay installed; the daemon just
+  drops events while off.
+- `dhikrncode setup` re-runs the wizard explicitly.
+- `dhikrncode init` now also marks setup as complete, so power users
+  who skip the wizard don't see it later.
+- Help output is reorganized by use-case (most-used / setup / daemon /
+  other).
+
 ## 0.1.4
 
 - **One-command setup.** Running `dhikrncode` for the first time now

@@ -14,7 +14,13 @@ async function run() {
   saveSettings(settings);
 
   // Clear any previous "you uninstalled" marker so the REPL stops nagging.
-  config.update({ meta: { uninstalledAt: null } });
+  // Also mark setup as complete so we don't re-prompt the wizard.
+  config.update({
+    meta: {
+      uninstalledAt: null,
+      setupCompletedAt: new Date().toISOString(),
+    },
+  });
 
   console.log(`dhikrncode: wrote ${SETTINGS_PATH}`);
   if (added.length === 0) {

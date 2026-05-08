@@ -15,6 +15,9 @@ const COMMANDS = {
   },
   repl: () => require('./commands/repl.js').run,
   shell: () => require('./commands/repl.js').run,
+  setup: () => require('./commands/setup.js').run,
+  on: () => require('./commands/onoff.js').on.run,
+  off: () => require('./commands/onoff.js').off.run,
   help: () => printHelp,
   '--help': () => printHelp,
   '-h': () => printHelp,
@@ -26,22 +29,29 @@ const COMMANDS = {
 function printHelp() {
   console.log(`dhikrncode — dhikr / Qur'an companion for AI coding sessions
 
-Quick start:
-  dhikrncode               Run with no args — sets up Claude Code hooks
-                           on first run, then drops into the interactive shell
-  dhikrncode uninstall     Remove hooks, stop the daemon, stop nagging
+Most-used:
+  dhikrncode               First time: runs the setup wizard.
+                           After that: opens the interactive shell.
+  dhikrncode on            Quick toggle on (keeps hooks installed)
+  dhikrncode off           Quick toggle off
+  dhikrncode uninstall     Remove hooks, stop daemon, stop nagging
 
-Other commands:
-  dhikrncode init          Manually install Claude Code hooks
-  dhikrncode config        Configure (or use the shell)
+Setup / config:
+  dhikrncode setup         Re-run the setup wizard
+  dhikrncode init          Install hooks non-interactively (skip wizard)
+  dhikrncode config        Detailed configuration
+
+Daemon / window:
   dhikrncode start         Open the window now (manual)
   dhikrncode stop          Signal "ready" now
-  dhikrncode kill          Stop the running daemon
-  dhikrncode restart       Stop daemon and re-open window
+  dhikrncode kill          Stop the daemon
+  dhikrncode restart       Stop + reopen
   dhikrncode daemon        Run daemon in foreground (debug)
-  dhikrncode hook <event>  Internal: invoked by Claude Code
+
+Other:
   dhikrncode help          This help
   dhikrncode version       Show version
+  dhikrncode hook <event>  Internal: invoked by Claude Code
 
 Docs: https://github.com/ibnmukthar/dhikrncode
 `);
@@ -52,49 +62,43 @@ function printVersion() {
   console.log(pkg.version);
 }
 
-async function autoSetupIfNeeded() {
-  const {
-    loadSettings,
-    saveSettings,
-    installHooks,
-    hooksInstalled,
-  } = require('./lib/settings.js');
+function noticeIfHooksMissing() {
+  const { loadSettings, hooksInstalled } = require('./lib/settings.js');
   const config = require('./lib/config-store.js');
-
   const settings = loadSettings();
   const cfg = config.load();
-  const previouslyUninstalled = cfg.meta && cfg.meta.uninstalledAt;
-
-  if (hooksInstalled(settings)) return; // nothing to do
-
-  if (previouslyUninstalled) {
+  if (hooksInstalled(settings)) return;
+  if (cfg.meta && cfg.meta.uninstalledAt) {
     console.log('dhikrncode: hooks are not installed (you previously uninstalled).');
     console.log("Type 'init' to re-enable Claude Code integration, or 'exit' to leave.\n");
-    return;
-  }
-
-  // First-time setup: install hooks silently for new users.
-  const { settings: next, added } = installHooks(settings);
-  saveSettings(next);
-  if (added.length > 0) {
-    console.log('✓ Set up Claude Code hooks (~/.claude/settings.json)');
-    console.log('  Run `uninstall` inside the shell to remove them.\n');
+  } else {
+    console.log('dhikrncode: hooks not installed. Run `dhikrncode init` to enable Claude Code integration.\n');
   }
 }
 
 async function main() {
   const [, , cmd, ...rest] = process.argv;
 
-  // No args + interactive shell → drop into REPL.  Non-TTY (pipes, scripts)
-  // keeps the help-and-exit behavior so we don't break existing tooling.
   let factory;
+
   if (!cmd && process.stdin.isTTY && process.stdout.isTTY) {
-    try {
-      await autoSetupIfNeeded();
-    } catch (err) {
-      console.error(`dhikrncode: setup check failed: ${err.message}`);
+    // First-ever run? Walk the user through setup.
+    const config = require('./lib/config-store.js');
+    const cfg = config.load();
+    if (!cfg.meta || !cfg.meta.setupCompletedAt) {
+      factory = COMMANDS.setup;
+    } else {
+      // Subsequent run → check hooks state, drop into REPL
+      try {
+        noticeIfHooksMissing();
+      } catch (err) {
+        console.error(`dhikrncode: ${err.message}`);
+      }
+      factory = COMMANDS.repl;
     }
-    factory = COMMANDS.repl;
+  } else if (!cmd) {
+    // Non-TTY with no command: just print help.
+    factory = COMMANDS.help;
   } else {
     factory = COMMANDS[cmd] || COMMANDS.help;
   }
