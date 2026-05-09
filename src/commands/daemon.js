@@ -438,14 +438,18 @@ function handleEvent(payload, hub) {
       break;
     }
     case 'pre-tool-use': {
-      // Agent is actively running tools. If we'd transitioned to "ready"
-      // (e.g., the user just approved a permission prompt), flip back to
-      // "busy" so the dhikr window keeps the user company while work
-      // resumes. We deliberately no-op when already busy/idle to avoid
-      // churning state on every tool invocation.
-      if (hub.state.phase === 'ready') {
+      // Agent is actively running tools. Treat this the same as a fresh
+      // user prompt when the window isn't already showing busy:
+      //  - state=ready (just answered a permission prompt) → flip to busy
+      //  - state=idle  (auto-close countdown closed the tab) → flip to busy AND reopen
+      //  - state=busy  (already showing work-in-progress) → no-op
+      // The reopen path matters when the user answered a question Claude
+      // asked from a terminal and the dhikr tab had timed out in the
+      // meantime — without this, the window never comes back.
+      if (hub.state.phase !== 'busy') {
         cancelPendingRepeats();
         hub.setState({ phase: 'busy', reason: null });
+        maybeOpenWindow(hub);
       }
       break;
     }

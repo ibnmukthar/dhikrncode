@@ -3,6 +3,16 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.9
+
+- **Fix: window now reopens after a permission/question round-trip.**
+  Scenario: agent asks something → window times out via the auto-close
+  countdown → user answers in the terminal → agent resumes work. In
+  v0.1.8 the dhikr window stayed closed because the `PreToolUse` handler
+  only flipped state when it saw "ready" (it ignored "idle"). Now it
+  reopens the window from any non-busy state, so the user can keep doing
+  dhikr through the rest of the session.
+
 ## 0.1.8
 
 - **Refocus the terminal when the dhikr tab closes.** When the auto-close
