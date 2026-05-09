@@ -3,7 +3,13 @@
 const { send } = require('../lib/daemon-client.js');
 const { detectSource } = require('../lib/source-detect.js');
 
-const VALID = new Set(['user-prompt-submit', 'notification', 'stop', 'pre-tool-use']);
+const VALID = new Set([
+  'user-prompt-submit',
+  'notification',
+  'stop',
+  'pre-tool-use',
+  'post-tool-use',
+]);
 
 function readStdin(timeoutMs = 200) {
   return new Promise((resolve) => {

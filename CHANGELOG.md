@@ -3,6 +3,19 @@
 All notable changes to dhikrncode are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.1.10
+
+- **Fix: window now opens during the "Updating…" pause after answering
+  Claude's questions.** When the user answered an AskUserQuestion-style
+  tool, the agent often spends a few seconds processing/writing text
+  before calling another tool. Previously only `PreToolUse` was hooked,
+  so the dhikr window stayed dark through that pause. We now also hook
+  `PostToolUse` (fires immediately when the user's answer comes back),
+  and the tool-activity handler always re-checks `maybeOpenWindow` even
+  when state was already busy — so a manually-closed tab during a
+  session reopens on the next tool boundary too. Cooldown logic inside
+  `maybeOpenWindow` keeps this from spamming new tabs.
+
 ## 0.1.9
 
 - **Fix: window now reopens after a permission/question round-trip.**

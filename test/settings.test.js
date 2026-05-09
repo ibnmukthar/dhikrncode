@@ -23,12 +23,13 @@ test('install adds all hooks to empty settings', () => {
   const { settings, added } = installHooks({});
   assert.deepStrictEqual(
     added.sort(),
-    ['Notification', 'PreToolUse', 'Stop', 'UserPromptSubmit']
+    ['Notification', 'PostToolUse', 'PreToolUse', 'Stop', 'UserPromptSubmit']
   );
   assert.ok(settings.hooks.UserPromptSubmit);
   assert.ok(settings.hooks.Notification);
   assert.ok(settings.hooks.Stop);
   assert.ok(settings.hooks.PreToolUse);
+  assert.ok(settings.hooks.PostToolUse);
 
   const cmds = settings.hooks.Stop[0].hooks.map((h) => h.command);
   assert.ok(cmds.some((c) => c.startsWith('dhikrncode hook stop')));
@@ -83,7 +84,7 @@ test('uninstall removes only our entries', () => {
   const installed = installHooks(existing).settings;
   const { settings, removed } = uninstallHooks(installed);
 
-  assert.strictEqual(removed.length, 4);
+  assert.strictEqual(removed.length, 5);
   // user hook still there
   const stopCommands = settings.hooks.Stop[0].hooks.map((h) => h.command);
   assert.ok(stopCommands.includes('echo "user hook"'));

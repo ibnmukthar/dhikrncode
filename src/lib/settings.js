@@ -17,6 +17,12 @@ const HOOK_EVENTS = [
   // window state from "ready (approval)" back to "busy" when the agent
   // resumes work, so users can keep doing dhikr while the session continues.
   { event: 'PreToolUse', arg: 'pre-tool-use' },
+  // PostToolUse fires the moment a tool finishes — including AskUserQuestion
+  // and similar interactive tools. It's our signal that the user just
+  // answered something in the terminal and the agent is back to processing
+  // (which may not call another tool for a while), so we use it to keep the
+  // dhikr window in front during the "Updating..." kind of pause.
+  { event: 'PostToolUse', arg: 'post-tool-use' },
 ];
 
 function loadSettings(filePath = SETTINGS_PATH) {

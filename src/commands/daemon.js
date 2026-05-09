@@ -437,20 +437,22 @@ function handleEvent(payload, hub) {
       hub.setState({ phase: 'ready', reason: 'done' });
       break;
     }
-    case 'pre-tool-use': {
-      // Agent is actively running tools. Treat this the same as a fresh
-      // user prompt when the window isn't already showing busy:
-      //  - state=ready (just answered a permission prompt) → flip to busy
-      //  - state=idle  (auto-close countdown closed the tab) → flip to busy AND reopen
-      //  - state=busy  (already showing work-in-progress) → no-op
-      // The reopen path matters when the user answered a question Claude
-      // asked from a terminal and the dhikr tab had timed out in the
-      // meantime — without this, the window never comes back.
+    case 'pre-tool-use':
+    case 'post-tool-use': {
+      // Tool activity = agent is working. Two responsibilities:
+      //  1. If state isn't busy, flip to busy (covers ready→busy after a
+      //     permission/question round-trip and idle→busy after auto-close).
+      //  2. Always check maybeOpenWindow — even when state was already busy.
+      //     Why: the user may have manually closed the tab while busy, and
+      //     PostToolUse fires for AskUserQuestion-style tools right when
+      //     they answer in the terminal, before any new tool starts. The
+      //     inner cooldown / WS-connection checks in maybeOpenWindow keep
+      //     this from spamming new tabs.
       if (hub.state.phase !== 'busy') {
         cancelPendingRepeats();
         hub.setState({ phase: 'busy', reason: null });
-        maybeOpenWindow(hub);
       }
+      maybeOpenWindow(hub);
       break;
     }
     default:
